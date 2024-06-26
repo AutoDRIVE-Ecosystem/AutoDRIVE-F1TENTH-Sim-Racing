@@ -7,15 +7,15 @@
 # Set base image
 FROM osrf/ros:humble-desktop
 
-# # Install display drivers
-# RUN apt update && apt install -y libgdal-dev ffmpeg libsm6 libxext6
+# Install display drivers
+RUN apt update && apt install -y libgdal-dev ffmpeg libsm6 libxext6
 
-# # Install Python
-# RUN add-apt-repository ppa:deadsnakes/ppa
-# RUN apt update
-# RUN apt install python3.8.10
-# RUN echo 'alias python3=python3.8.10' >> ~/.bashrc
-# RUN source ~/.bashrc
+# Install Python
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt update
+RUN apt install python3.8.10
+RUN echo 'alias python3=python3.8.10' >> ~/.bashrc
+RUN source ~/.bashrc
 
 # Install Python libraries
 RUN pip3 install attrdict
