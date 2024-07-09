@@ -7,7 +7,6 @@
 # Set base image and environment variables
 FROM nvidia/vulkan:1.1.121-cuda-10.1--ubuntu18.04
 ENV DEBIAN_FRONTEND=noninteractive
-ENV XDG_RUNTIME_DIR=/tmp/runtime-dir
 
 # Add CUDA repository key
 RUN rm /etc/apt/sources.list.d/cuda.list
