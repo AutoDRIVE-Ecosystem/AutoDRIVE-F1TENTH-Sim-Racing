@@ -11,8 +11,7 @@ Build Simulator Container:
 `docker build --tag autodriveecosystem/autodrive_f1tenth_sim:v2024.1 -f autodrive_simulator.Dockerfile .`
 
 Launch Simulator Container:
-`docker run --rm -it -e DISPLAY=172.20.10.4:0.0 --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1`
-
+`xhost local:root`
 `docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1`
 
 Test GUI via Container:
