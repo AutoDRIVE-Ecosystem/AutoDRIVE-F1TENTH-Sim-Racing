@@ -13,6 +13,8 @@ Build Simulator Container:
 Launch Simulator Container:
 `docker run --rm -it -e DISPLAY=172.20.10.4:0.0 --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1`
 
+`docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1`
+
 Test GUI via Container:
 Install x11 apps: `apt-get install x11-apps`
 Run x11 eyes: `xeyes`
