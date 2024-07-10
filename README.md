@@ -1,5 +1,5 @@
 # AutoDRIVE-F1TENTH-Sim-Racing
-F1TENTH Autonomous Sim-Racing using AutoDRIVE Ecosystem
+F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 ## This repository is currently a work-in-progress and under heavy development. Stable versions will be soon available under Releases.
 
