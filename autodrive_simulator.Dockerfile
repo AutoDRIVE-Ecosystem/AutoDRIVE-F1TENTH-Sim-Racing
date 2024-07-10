@@ -24,6 +24,7 @@ RUN apt update \
         vim \
         curl \
         unzip \
+        net-tools \
         libvulkan1 \
         libc++1 \
         libc++abi1 \
@@ -32,7 +33,9 @@ RUN apt update \
 
 # Install tools for display
 RUN apt update --fix-missing \
-    && apt install -y x11vnc xvfb xtightvncviewer ffmpeg
+    && apt install -y x11vnc xvfb xtightvncviewer ffmpeg \
+    && mkdir ~/.vnc \
+    && x11vnc -storepasswd autodrive-f1tenth-sim ~/.vnc/passwd
 
 # Copy AutoDRIVE Simulator executable
 COPY autodrive_simulator /home/autodrive_simulator
