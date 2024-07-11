@@ -2,7 +2,7 @@
 F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 > [!NOTE]
-> **This repository is currently a work-in-progress and under heavy development. Stable versions will be soon available under Releases.**
+> **This repository is currently a work-in-progress and under heavy development. Stable versions will be soon available under [Releases](https://github.com/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing/releases).**
 
 ## Build Simulator Container:
 
