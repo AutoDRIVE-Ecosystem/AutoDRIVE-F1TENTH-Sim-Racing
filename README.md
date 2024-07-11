@@ -33,30 +33,30 @@ docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw
 ## Generally Helpful Docker Tips
 1. To access the container while it is running, execute the following command in a new terminal window to start a new bash session inside the container:
 ```bash
-$ docker exec -it <container_name> bash
+docker exec -it <container_name> bash
 ```
 
 2. To exit the bash session(s), simply execute:
 ```bash
-$ exit
+exit
 ```
 
 3. To kill the container, execute the following command:
 ```bash
-$ docker kill <container_name>
+docker kill <container_name>
 ```
 
 4. To remove the container, simply execute:
 ```bash
-$ docker rm <container_name>
+docker rm <container_name>
 ```
 
 5. Running or caching multiple docker images, containers, volumes, and networks can quickly consume a lot of disk space. Hence, it is always a good idea to frequently check docker disk utilization:
 ```bash
-$ docker system df
+docker system df
 ```
 
 6. To avoid utilizing a lot of disk space, it is a good idea to frequently purge docker resources such as images, containers, volumes, and networks that are unused or dangling (i.e. not tagged or associated with a container). There are several ways with many options to achieve this, please refer to appropriate documentation. The easiest way (but a potentially dangerous one) is to use a single command to clean up all the docker resources (dangling or otherwise):
 ```bash
-$ docker system prune -a
+docker system prune -a
 ```
