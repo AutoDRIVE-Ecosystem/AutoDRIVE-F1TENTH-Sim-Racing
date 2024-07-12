@@ -20,6 +20,34 @@ xhost local:root
 docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1
 ```
 
+## Pushing the Simulator Container to Docker Hub:
+
+1. Run the image you created in the previous step inside a container:
+```bash
+xhost local:root
+docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+```
+
+2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
+```bash
+$ docker ps -a
+```
+
+3. Commit changes to Docker Hub:
+```bash
+docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+```
+
+4. Login to Docker Hub:
+```bash
+$ docker login
+```
+
+5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
+```bash
+docker push autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+```
+
 ## Build Devkit Container:
 
 ```bash
@@ -31,6 +59,34 @@ docker build --tag autodriveecosystem/autodrive_f1tenth_api:v2024.1 -f autodrive
 ```bash
 xhost local:root
 docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:v2024.1
+```
+
+## Pushing the Devkit Container to Docker Hub:
+
+1. Run the image you created in the previous step inside a container:
+```bash
+xhost local:root
+docker run --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:v2024.1
+```
+
+2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
+```bash
+$ docker ps -a
+```
+
+3. Commit changes to Docker Hub:
+```bash
+docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_api:v2024.1
+```
+
+4. Login to Docker Hub:
+```bash
+$ docker login
+```
+
+5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
+```bash
+docker push autodriveecosystem/autodrive_f1tenth_api:v2024.1
 ```
 
 ## Generally Helpful Docker Tips
