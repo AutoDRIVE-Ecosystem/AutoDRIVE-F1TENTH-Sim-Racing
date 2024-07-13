@@ -6,7 +6,6 @@
 
 # Set base image and environment variables
 FROM nvidia/vulkan:1.1.121-cuda-10.1--ubuntu18.04
-ENV DEBIAN_FRONTEND=noninteractive
 
 # Add CUDA repository key
 RUN rm /etc/apt/sources.list.d/cuda.list
@@ -20,6 +19,7 @@ RUN apt update \
     && apt install -y --no-install-recommends \
         sudo \
         wget \
+        gedit \
         nano \
         vim \
         curl \
@@ -33,16 +33,15 @@ RUN apt update \
 
 # Install tools for display
 RUN apt update --fix-missing \
-    && apt install -y x11vnc xvfb xtightvncviewer ffmpeg \
-    && mkdir ~/.vnc \
-    && x11vnc -storepasswd autodrive-f1tenth-sim ~/.vnc/passwd
+    && apt install -y xvfb ffmpeg libgdal-dev libsm6 libxext6
 
 # Copy AutoDRIVE Simulator executable
 COPY autodrive_simulator /home/autodrive_simulator
 
-# Copy entrypoint script
-COPY autodrive_simulator.sh home/autodrive_simulator
-
 # Set work directory and register executable
 WORKDIR /home/autodrive_simulator
 RUN chmod +x /home/autodrive_simulator/AutoDRIVE\ Simulator.x86_64
+
+# Set entrypoint
+COPY autodrive_simulator.sh /home
+ENTRYPOINT ["/home/autodrive_simulator.sh"]

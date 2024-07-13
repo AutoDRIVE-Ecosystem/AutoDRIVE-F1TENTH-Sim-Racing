@@ -7,14 +7,12 @@
 # Set base image
 FROM osrf/ros:foxy-desktop
 
-# Install display drivers
-RUN apt update && apt install -y libgdal-dev ffmpeg libsm6 libxext6
-
 # Install Debian packages
 RUN apt update \
     && apt install -y --no-install-recommends \
         sudo \
         wget \
+        gedit \
         nano \
         vim \
         curl \
@@ -48,16 +46,19 @@ RUN apt update && apt install -y --no-install-recommends \
 
 # Install tools for display
 RUN apt update --fix-missing \
-    && apt install -y x11vnc xvfb xtightvncviewer ffmpeg \
-    && mkdir ~/.vnc \
-    && x11vnc -storepasswd autodrive-f1tenth-api ~/.vnc/passwd
+    && apt install -y xvfb ffmpeg libgdal-dev libsm6 libxext6
 
 # Copy AutoDRIVE Devkit (ROS 2 API)
 COPY autodrive_devkit/. /home/autodrive_devkit/src
 RUN cd /home/autodrive_devkit && colcon build
-RUN /bin/bash -c 'echo "source /home/autodrive_devkit/install/setup.bash" >> ~/.bashrc' \
+RUN /bin/bash -c 'echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc' \
+    && /bin/bash -c 'echo "source /home/autodrive_devkit/install/setup.bash" >> ~/.bashrc' \
     && /bin/bash -c 'source ~/.bashrc'
 
 # Set work directory and expose port
 WORKDIR /home/autodrive_devkit
 EXPOSE 4567
+
+# Set entrypoint
+COPY autodrive_devkit.sh /home
+ENTRYPOINT ["/home/autodrive_devkit.sh"]
