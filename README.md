@@ -30,7 +30,7 @@ docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /t
 
 2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
 ```bash
-$ docker ps -a
+docker ps -a
 ```
 
 3. Commit changes to Docker Hub:
@@ -40,7 +40,7 @@ docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAIN
 
 4. Login to Docker Hub:
 ```bash
-$ docker login
+docker login
 ```
 
 5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
@@ -71,7 +71,7 @@ docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /t
 
 2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
 ```bash
-$ docker ps -a
+docker ps -a
 ```
 
 3. Commit changes to Docker Hub:
@@ -81,7 +81,7 @@ docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAIN
 
 4. Login to Docker Hub:
 ```bash
-$ docker login
+docker login
 ```
 
 5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
@@ -92,7 +92,7 @@ docker push autodriveecosystem/autodrive_f1tenth_api:v2024.1
 ## Generally Helpful Docker Tips:
 1. To access the container while it is running, execute the following command in a new terminal window to start a new bash session inside the container:
 ```bash
-docker exec -it <container_name> bash
+docker exec -it <CONTAINER NAME> bash
 ```
 
 2. To exit the bash session(s), simply execute:
@@ -102,12 +102,12 @@ exit
 
 3. To kill the container, execute the following command:
 ```bash
-docker kill <container_name>
+docker kill <CONTAINER NAME>
 ```
 
 4. To remove the container, simply execute:
 ```bash
-docker rm <container_name>
+docker rm <CONTAINER NAME>
 ```
 
 5. Running or caching multiple docker images, containers, volumes, and networks can quickly consume a lot of disk space. Hence, it is always a good idea to frequently check docker disk utilization:
