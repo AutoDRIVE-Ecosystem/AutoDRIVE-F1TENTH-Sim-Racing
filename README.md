@@ -1,4 +1,7 @@
-# AutoDRIVE-F1TENTH-Sim-Racing
+# AutoDRIVE-F1TENTH Sim-Racing
+
+![AutoDRIVE-F1TENTH Sim-Racing](Banner.png)
+
 F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 > [!NOTE]
