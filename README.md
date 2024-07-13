@@ -2,7 +2,6 @@
 F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 > [!NOTE]
-> **This repository is currently a work-in-progress and under heavy development. Stable versions will be soon available under [Releases](https://github.com/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing/releases).**
 > - The setup has been only tested on the [Ubuntu](https://ubuntu.com) operating system.
 > - It is assumed that [Docker](https://docs.docker.com/engine/install) is installed.
 > - It is assumed that if the Docker container is to take advantage of an NVIDIA GPU, the host machine has been properly configured by installing the necessary NVIDIA GPU drivers and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html).
