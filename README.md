@@ -9,20 +9,22 @@ F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 > - It is assumed that [Docker](https://docs.docker.com/engine/install) is installed.
 > - It is assumed that if the Docker container is to take advantage of an NVIDIA GPU, the host machine has been properly configured by installing the necessary NVIDIA GPU drivers and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html).
 
-## Build AutoDRIVE Simulator Container:
+## AutoDRIVE Simulator Container
+
+### Build:
 
 ```bash
 docker build --tag autodriveecosystem/autodrive_f1tenth_sim:v2024.1 -f autodrive_simulator.Dockerfile .
 ```
 
-## Run AutoDRIVE Simulator Container:
+### Run:
 
 ```bash
 xhost local:root
 docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1
 ```
 
-## Push AutoDRIVE Simulator Container:
+### Push:
 
 1. Run the image you created in the previous step inside a container:
 ```bash
@@ -50,20 +52,22 @@ docker login
 docker push autodriveecosystem/autodrive_f1tenth_sim:v2024.1
 ```
 
-## Build AutoDRIVE Devkit Container:
+## AutoDRIVE Devkit Container
+
+### Build:
 
 ```bash
 docker build --tag autodriveecosystem/autodrive_f1tenth_api:v2024.1 -f autodrive_devkit.Dockerfile .
 ```
 
-## Run AutoDRIVE Devkit Container:
+### Run:
 
 ```bash
 xhost local:root
 docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:v2024.1
 ```
 
-## Push AutoDRIVE Devkit Container:
+### Push:
 
 1. Run the image you created in the previous step inside a container:
 ```bash
@@ -91,7 +95,7 @@ docker login
 docker push autodriveecosystem/autodrive_f1tenth_api:v2024.1
 ```
 
-## Generally Helpful Docker Tips:
+## Generally Helpful Docker Tips
 1. To access the container while it is running, execute the following command in a new terminal window to start a new bash session inside the container:
 ```bash
 docker exec -it <CONTAINER NAME> bash
