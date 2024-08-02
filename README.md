@@ -1,5 +1,12 @@
 # AutoDRIVE-F1TENTH Sim-Racing
 
+![Github Stars](https://badgen.net/github/stars/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?icon=github&label=stars)
+![Github Forks](https://badgen.net/github/forks/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?icon=github&label=forks)
+[![Sim Docker Stars](https://badgen.net/docker/stars/autodriveecosystem/autodrive_f1tenth_sim?icon=docker&label=sim%20stars)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_sim/)
+[![Sim Docker Pulls](https://badgen.net/docker/pulls/autodriveecosystem/autodrive_f1tenth_sim?icon=docker&label=sim%20pulls)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_sim/)
+[![API Docker Stars](https://badgen.net/docker/stars/autodriveecosystem/autodrive_f1tenth_api?icon=docker&label=api%20stars)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_api/)
+[![API Docker Pulls](https://badgen.net/docker/pulls/autodriveecosystem/autodrive_f1tenth_api?icon=docker&label=api%20pulls)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_api/)
+
 ![AutoDRIVE-F1TENTH Sim-Racing](Banner.png)
 
 F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
@@ -14,14 +21,14 @@ F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 ### Build:
 
 ```bash
-docker build --tag autodriveecosystem/autodrive_f1tenth_sim:v2024.1 -f autodrive_simulator.Dockerfile .
+docker build --tag autodriveecosystem/autodrive_f1tenth_sim:<TAG> -f autodrive_simulator.Dockerfile .
 ```
 
 ### Run:
 
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 ### Push:
@@ -29,7 +36,7 @@ docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /t
 1. Run the image you created in the previous step inside a container:
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
@@ -39,7 +46,7 @@ docker ps -a
 
 3. Commit changes to Docker Hub:
 ```bash
-docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 4. Login to Docker Hub:
@@ -49,7 +56,7 @@ docker login
 
 5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
 ```bash
-docker push autodriveecosystem/autodrive_f1tenth_sim:v2024.1
+docker push autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 ## AutoDRIVE Devkit Container
@@ -57,14 +64,14 @@ docker push autodriveecosystem/autodrive_f1tenth_sim:v2024.1
 ### Build:
 
 ```bash
-docker build --tag autodriveecosystem/autodrive_f1tenth_api:v2024.1 -f autodrive_devkit.Dockerfile .
+docker build --tag autodriveecosystem/autodrive_f1tenth_api:<TAG> -f autodrive_devkit.Dockerfile .
 ```
 
 ### Run:
 
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:v2024.1
+docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
 ### Push:
@@ -72,7 +79,7 @@ docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /t
 1. Run the image you created in the previous step inside a container:
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:v2024.1
+docker run --name autodrive_f1tenth_api --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
 2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
@@ -82,7 +89,7 @@ docker ps -a
 
 3. Commit changes to Docker Hub:
 ```bash
-docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_api:v2024.1
+docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
 4. Login to Docker Hub:
@@ -92,7 +99,7 @@ docker login
 
 5. Push the container to Docker Hub, once done, you should be able to see your repository on Docker Hub:
 ```bash
-docker push autodriveecosystem/autodrive_f1tenth_api:v2024.1
+docker push autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
 ## Generally Helpful Docker Tips
