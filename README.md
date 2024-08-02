@@ -9,7 +9,7 @@
 
 ![AutoDRIVE-F1TENTH Sim-Racing](Banner.png)
 
-F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosyste
+F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 > [!NOTE]
 > - The setup has been only tested on the [Ubuntu](https://ubuntu.com) operating system.
