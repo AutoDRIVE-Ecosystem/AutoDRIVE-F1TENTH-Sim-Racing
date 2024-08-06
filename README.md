@@ -1,7 +1,7 @@
 # AutoDRIVE-F1TENTH Sim-Racing
 
-![Github Stars](https://img.shields.io/github/stars/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?style=flat&color=blue&label=downloads&logo=github&logoColor=white)
-![Github Forks](https://img.shields.io/github/forks/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?style=flat&color=blue&label=downloads&logo=github&logoColor=white)
+![Github Stars](https://img.shields.io/github/stars/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?style=flat&color=blue&label=stars&logo=github&logoColor=white)
+![Github Forks](https://img.shields.io/github/forks/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing?style=flat&color=blue&label=forks&logo=github&logoColor=white)
 ![Github Downloads](https://img.shields.io/github/downloads/AutoDRIVE-Ecosystem/AutoDRIVE-F1TENTH-Sim-Racing/total?style=flat&color=blue&label=downloads&logo=github&logoColor=white)
 [![Sim Docker Stars](https://badgen.net/docker/stars/autodriveecosystem/autodrive_f1tenth_sim?icon=docker&label=sim%20stars)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_sim/)
 [![Sim Docker Pulls](https://badgen.net/docker/pulls/autodriveecosystem/autodrive_f1tenth_sim?icon=docker&label=sim%20pulls)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_sim/)
