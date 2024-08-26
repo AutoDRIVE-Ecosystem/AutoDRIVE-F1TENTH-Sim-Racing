@@ -124,7 +124,7 @@ docker kill <CONTAINER NAME>
 docker rm <CONTAINER NAME>
 ```
 
-5. Running or caching multiple docker images, containers, volumes, and networks can quickly consume a lot of disk space. Hence, it is always a good idea to frequently check docker disk utilization:
+5. Running or caching multiple docker images, containers, volumes, and networks can quickly consume a lot of disk space. Hence, it is always a good idea to frequently check Docker disk utilization:
 ```bash
 docker system df
 ```
