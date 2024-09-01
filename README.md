@@ -136,13 +136,13 @@ docker system prune -a
 
 ## Citation
 
-We encourage you to read and cite the following papers if you use any part of this project for your research:
+We encourage you to read and cite the following papers if you use any part of the competition framework for your research:
 
 #### [AutoDRIVE: A Comprehensive, Flexible and Integrated Digital Twin Ecosystem for Enhancing Autonomous Driving Research and Education](https://arxiv.org/abs/2212.05241)
 ```bibtex
 @article{AutoDRIVE-Ecosystem-2023,
 author = {Samak, Tanmay and Samak, Chinmay and Kandhasamy, Sivanathan and Krovi, Venkat and Xie, Ming},
-title = {AutoDRIVE: A Comprehensive, Flexible and Integrated Digital Twin Ecosystem for Autonomous Driving Research &amp; Education},
+title = {AutoDRIVE: A Comprehensive, Flexible and Integrated Digital Twin Ecosystem for Autonomous Driving Research & Education},
 journal = {Robotics},
 volume = {12},
 year = {2023},
