@@ -134,6 +134,14 @@ docker system df
 docker system prune -a
 ```
 
+7. After Docker Desktop is installed, Docker CLI commands are by default forwarded to Docker Desktop instead of Docker Engine, and hence you cannot connect to the Docker daemon without running Docker Desktop. In order to avoid this, just switch to the `default` Docker context:
+```bash
+docker context ls
+docker context use default
+```
+> [!NOTE]
+> It is not recommended to use Docker Desktop on the Linux operating system. This is because Docker Desktop creates a virtual machine based on Linux, which is first of all not needed for native (host) Linux OS, and secondly, it sometimes does not expose the necessary access ports for the containers (e.g., trouble with GPU access).
+
 ## Citation
 
 We encourage you to read and cite the following papers if you use any part of the competition framework for your research:
