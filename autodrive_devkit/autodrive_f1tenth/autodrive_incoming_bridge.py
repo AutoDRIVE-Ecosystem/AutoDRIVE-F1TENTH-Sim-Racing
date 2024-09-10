@@ -37,6 +37,7 @@ from geometry_msgs.msg import Point, TransformStamped # Point and TransformStamp
 from sensor_msgs.msg import JointState, Imu, LaserScan, Image # JointState, Imu, LaserScan and Image message classes
 from tf_transformations import quaternion_from_euler # Euler angle representation to quaternion representation
 from ament_index_python.packages import get_package_share_directory # Access package's shared directory path
+from threading import Thread
 
 # Python mudule imports
 from cv_bridge import CvBridge, CvBridgeError # ROS bridge for opencv library to handle images
@@ -195,6 +196,20 @@ def publish_collision_count_data(collision_count):
     publishers['pub_collision_count'].publish(create_int_msg(collision_count))
 
 #########################################################
+# ROS 2 SUBSCRIBER CALLBACKS
+#########################################################
+
+# VEHICLE DATA SUBSCRIBER CALLBACKS
+
+def callback_throttle_command(throttle_command_msg):
+    global throttle_command
+    throttle_command = float(np.round(throttle_command_msg.data, 3))
+
+def callback_steering_command(steering_command_msg):
+    global steering_command
+    steering_command = float(np.round(steering_command_msg.data, 3))
+
+#########################################################
 # WEBSOCKET SERVER INFRASTRUCTURE
 #########################################################
 
@@ -218,18 +233,6 @@ def bridge(sid, data):
 
     # Wait for data to become available
     if data:
-        # Try to read data from shared config file
-        api_config = configparser.ConfigParser()
-        try:
-            api_config.read(package_share_directory+'/api_config.ini')
-            # Update vehicle control commands
-            throttle_command = float(api_config['f1tenth_1']['throttle_command'])
-            steering_command = float(api_config['f1tenth_1']['steering_command'])
-
-        # Pass if file cannot be read
-        except:
-            pass
-
         ########################################################################
         # VEHICLE DATA
         ########################################################################
@@ -301,6 +304,7 @@ def main():
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
     autodrive_incoming_bridge = rclpy.create_node('autodrive_incoming_bridge') # Create ROS 2 node
+    autodrive_outgoing_bridge = rclpy.create_node('autodrive_outgoing_bridge') # Create ROS 2 node
     qos_profile = QoSProfile( # Ouality of Service profile
         reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE, # Reliable (not best effort) communication
         history=QoSHistoryPolicy.RMW_QOS_POLICY_HISTORY_KEEP_LAST, # Keep/store only up to last N samples
@@ -309,14 +313,28 @@ def main():
     cv_bridge = CvBridge() # ROS bridge object for opencv library to handle image data
     publishers = {e.name: autodrive_incoming_bridge.create_publisher(e.type, e.topic, qos_profile)
                   for e in config.pub_sub_dict.publishers} # Publishers
+    callbacks = {
+        # Vehicle data subscriber callbacks
+        '/autodrive/f1tenth_1/throttle_command': callback_throttle_command,
+        '/autodrive/f1tenth_1/steering_command': callback_steering_command,
+    } # Subscriber callback functions
+    subscribers = [autodrive_outgoing_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
+                   for e in config.pub_sub_dict.subscribers] # Subscribers
+    subscribers # Avoid unused variable warning
 
-    # Recursive operations while node is alive
-    while rclpy.ok():
-        app = socketio.WSGIApp(sio) # Create socketio WSGI application
-        pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server            
-        rclpy.spin_once(autodrive_incoming_bridge) # Spin the node once
+    executor = rclpy.executors.SingleThreadedExecutor()
+    executor.add_node(autodrive_incoming_bridge)
+    executor.add_node(autodrive_outgoing_bridge)
+
+    process = Thread(target=executor.spin)
+    process.daemon = True
+    process.start()
+
+    app = socketio.WSGIApp(sio) # Create socketio WSGI application
+    pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server
     
     autodrive_incoming_bridge.destroy_node() # Explicitly destroy the node
+    autodrive_outgoing_bridge.destroy_node() # Explicitly destroy the node
     rclpy.shutdown() # Shutdown this context
 
 ################################################################################
