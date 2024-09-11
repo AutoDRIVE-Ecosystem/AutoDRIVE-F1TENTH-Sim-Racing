@@ -33,15 +33,8 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='autodrive_f1tenth',
-            executable='autodrive_incoming_bridge',
-            name='autodrive_incoming_bridge',
-            emulate_tty=True,
-            output='screen',
-        ),
-        Node(
-            package='autodrive_f1tenth',
-            executable='autodrive_outgoing_bridge',
-            name='autodrive_outgoing_bridge',
+            executable='autodrive_bridge',
+            name='autodrive_bridge',
             emulate_tty=True,
             output='screen',
         ),

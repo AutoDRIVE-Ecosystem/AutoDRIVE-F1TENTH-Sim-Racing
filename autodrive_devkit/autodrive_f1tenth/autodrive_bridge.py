@@ -37,6 +37,7 @@ from geometry_msgs.msg import Point, TransformStamped # Point and TransformStamp
 from sensor_msgs.msg import JointState, Imu, LaserScan, Image # JointState, Imu, LaserScan and Image message classes
 from tf_transformations import quaternion_from_euler # Euler angle representation to quaternion representation
 from ament_index_python.packages import get_package_share_directory # Access package's shared directory path
+from threading import Thread
 
 # Python mudule imports
 from cv_bridge import CvBridge, CvBridgeError # ROS bridge for opencv library to handle images
@@ -53,7 +54,7 @@ import autodrive_f1tenth.config as config # AutoDRIVE Ecosystem ROS 2 configurat
 ################################################################################
 
 # Global declarations
-global autodrive_incoming_bridge, cv_bridge, publishers
+global autodrive_bridge, cv_bridge, publishers
 global throttle_command, steering_command
 
 # Initialize vehicle control commands
@@ -77,7 +78,7 @@ def create_float_msg(val):
 def create_joint_state_msg(joint_angle, joint_name, frame_id):
     js = JointState()
     js.header = Header()
-    js.header.stamp = autodrive_incoming_bridge.get_clock().now().to_msg()
+    js.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     js.header.frame_id = frame_id
     js.name = [joint_name]
     js.position = [joint_angle]
@@ -95,7 +96,7 @@ def create_point_msg(position):
 def create_imu_msg(orientation_quaternion, angular_velocity, linear_acceleration):
     imu = Imu()
     imu.header = Header()
-    imu.header.stamp = autodrive_incoming_bridge.get_clock().now().to_msg()
+    imu.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     imu.header.frame_id = 'imu'
     imu.orientation.x = orientation_quaternion[0]
     imu.orientation.y = orientation_quaternion[1]
@@ -115,7 +116,7 @@ def create_imu_msg(orientation_quaternion, angular_velocity, linear_acceleration
 def create_laser_scan_msg(lidar_scan_rate, lidar_range_array, lidar_intensity_array):
     ls = LaserScan()
     ls.header = Header()
-    ls.header.stamp = autodrive_incoming_bridge.get_clock().now().to_msg()
+    ls.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     ls.header.frame_id = 'lidar'
     ls.angle_min = -2.35619 # Minimum angle of laser scan (0 degrees)
     ls.angle_max = 2.35619 # Maximum angle of laser scan (270 degrees)
@@ -131,14 +132,14 @@ def create_laser_scan_msg(lidar_scan_rate, lidar_range_array, lidar_intensity_ar
 def create_image_msg(image_array, frame_id):
     img = cv_bridge.cv2_to_imgmsg(image_array, encoding="rgb8")
     img.header = Header()
-    img.header.stamp = autodrive_incoming_bridge.get_clock().now().to_msg()
+    img.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     img.header.frame_id = frame_id
     return img
 
 def broadcast_transform(child_frame_id, parent_frame_id, position_tf, orientation_tf):
-    tb = tf2_ros.TransformBroadcaster(autodrive_incoming_bridge)
+    tb = tf2_ros.TransformBroadcaster(autodrive_bridge)
     tf = TransformStamped()
-    tf.header.stamp = autodrive_incoming_bridge.get_clock().now().to_msg()
+    tf.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     tf.header.frame_id = parent_frame_id
     tf.child_frame_id = child_frame_id
     tf.transform.translation.x = position_tf[0] # Pos X
@@ -195,6 +196,20 @@ def publish_collision_count_data(collision_count):
     publishers['pub_collision_count'].publish(create_int_msg(collision_count))
 
 #########################################################
+# ROS 2 SUBSCRIBER CALLBACKS
+#########################################################
+
+# VEHICLE DATA SUBSCRIBER CALLBACKS
+
+def callback_throttle_command(throttle_command_msg):
+    global throttle_command
+    throttle_command = float(np.round(throttle_command_msg.data, 3))
+
+def callback_steering_command(steering_command_msg):
+    global steering_command
+    steering_command = float(np.round(steering_command_msg.data, 3))
+
+#########################################################
 # WEBSOCKET SERVER INFRASTRUCTURE
 #########################################################
 
@@ -210,7 +225,7 @@ def connect(sid, environ):
 @sio.on('Bridge')
 def bridge(sid, data):
     # Global declarations
-    global autodrive_incoming_bridge, cv_bridge, publishers
+    global autodrive_bridge, cv_bridge, publishers
     global throttle_command, steering_command
 
     # Get package's shared directory path
@@ -218,18 +233,6 @@ def bridge(sid, data):
 
     # Wait for data to become available
     if data:
-        # Try to read data from shared config file
-        api_config = configparser.ConfigParser()
-        try:
-            api_config.read(package_share_directory+'/api_config.ini')
-            # Update vehicle control commands
-            throttle_command = float(api_config['f1tenth_1']['throttle_command'])
-            steering_command = float(api_config['f1tenth_1']['steering_command'])
-
-        # Pass if file cannot be read
-        except:
-            pass
-
         ########################################################################
         # VEHICLE DATA
         ########################################################################
@@ -290,36 +293,47 @@ def bridge(sid, data):
         sio.emit('Bridge', data={'V1 Throttle': str(throttle_command), 'V1 Steering': str(steering_command)})
 
 #########################################################
-# AUTODRIVE ROS 2 INCOMING BRIDGE INFRASTRUCTURE
+# AUTODRIVE ROS 2 BRIDGE INFRASTRUCTURE
 #########################################################
 
 def main():
     # Global declarations
-    global autodrive_incoming_bridge, cv_bridge, publishers
+    global autodrive_bridge, cv_bridge, publishers
     global throttle_command, steering_command
 
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
-    autodrive_incoming_bridge = rclpy.create_node('autodrive_incoming_bridge') # Create ROS 2 node
+    autodrive_bridge = rclpy.create_node('autodrive_bridge') # Create ROS 2 node
     qos_profile = QoSProfile( # Ouality of Service profile
         reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE, # Reliable (not best effort) communication
         history=QoSHistoryPolicy.RMW_QOS_POLICY_HISTORY_KEEP_LAST, # Keep/store only up to last N samples
         depth=1 # Queue (buffer) size/depth (only honored if the “history” policy was set to “keep last”)
         )
     cv_bridge = CvBridge() # ROS bridge object for opencv library to handle image data
-    publishers = {e.name: autodrive_incoming_bridge.create_publisher(e.type, e.topic, qos_profile)
+    publishers = {e.name: autodrive_bridge.create_publisher(e.type, e.topic, qos_profile)
                   for e in config.pub_sub_dict.publishers} # Publishers
+    callbacks = {
+        # Vehicle data subscriber callbacks
+        '/autodrive/f1tenth_1/throttle_command': callback_throttle_command,
+        '/autodrive/f1tenth_1/steering_command': callback_steering_command,
+    } # Subscriber callback functions
+    subscribers = [autodrive_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
+                   for e in config.pub_sub_dict.subscribers] # Subscribers
+    subscribers # Avoid unused variable warning
 
-    # Recursive operations while node is alive
-    while rclpy.ok():
-        app = socketio.WSGIApp(sio) # Create socketio WSGI application
-        pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server            
-        rclpy.spin_once(autodrive_incoming_bridge) # Spin the node once
+    executor = rclpy.executors.SingleThreadedExecutor() # Create executor to control which threads callbacks get executed in
+    executor.add_node(autodrive_bridge) # Add a node whose callbacks should be managed by this executor
+
+    process = Thread(target=executor.spin, daemon=True) # Runs callbacks in the thread
+    process.start() # Activate the thread as demon (background process) and prompt it to the target function (spin the executor)
+
+    app = socketio.WSGIApp(sio) # Create socketio WSGI application
+    pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server
     
-    autodrive_incoming_bridge.destroy_node() # Explicitly destroy the node
+    autodrive_bridge.destroy_node() # Explicitly destroy the node
     rclpy.shutdown() # Shutdown this context
 
 ################################################################################
 
 if __name__ == '__main__':
-    main() # Call main function of AutoDRIVE Ecosystem ROS 2 incoming bridge
+    main() # Call main function of AutoDRIVE ROS 2 bridge
