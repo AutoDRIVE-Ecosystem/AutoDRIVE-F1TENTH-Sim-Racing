@@ -303,7 +303,12 @@ def main():
 
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
+<<<<<<< HEAD:autodrive_devkit/autodrive_f1tenth/autodrive_bridge.py
     autodrive_bridge = rclpy.create_node('autodrive_bridge') # Create ROS 2 node
+=======
+    autodrive_incoming_bridge = rclpy.create_node('autodrive_incoming_bridge') # Create ROS 2 node
+    autodrive_outgoing_bridge = rclpy.create_node('autodrive_outgoing_bridge') # Create ROS 2 node
+>>>>>>> 562b2e5690b3e3b25645e24e9f87ffabee6e7953:autodrive_devkit/autodrive_f1tenth/autodrive_incoming_bridge.py
     qos_profile = QoSProfile( # Ouality of Service profile
         reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE, # Reliable (not best effort) communication
         history=QoSHistoryPolicy.RMW_QOS_POLICY_HISTORY_KEEP_LAST, # Keep/store only up to last N samples
@@ -317,6 +322,7 @@ def main():
         '/autodrive/f1tenth_1/throttle_command': callback_throttle_command,
         '/autodrive/f1tenth_1/steering_command': callback_steering_command,
     } # Subscriber callback functions
+<<<<<<< HEAD:autodrive_devkit/autodrive_f1tenth/autodrive_bridge.py
     subscribers = [autodrive_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
                    for e in config.pub_sub_dict.subscribers] # Subscribers
     subscribers # Avoid unused variable warning
@@ -326,14 +332,36 @@ def main():
 
     process = Thread(target=executor.spin, daemon=True) # Runs callbacks in the thread
     process.start() # Activate the thread as demon (background process) and prompt it to the target function (spin the executor)
+=======
+    subscribers = [autodrive_outgoing_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
+                   for e in config.pub_sub_dict.subscribers] # Subscribers
+    subscribers # Avoid unused variable warning
+
+    executor = rclpy.executors.SingleThreadedExecutor()
+    executor.add_node(autodrive_incoming_bridge)
+    executor.add_node(autodrive_outgoing_bridge)
+
+    process = Thread(target=executor.spin)
+    process.daemon = True
+    process.start()
+>>>>>>> 562b2e5690b3e3b25645e24e9f87ffabee6e7953:autodrive_devkit/autodrive_f1tenth/autodrive_incoming_bridge.py
 
     app = socketio.WSGIApp(sio) # Create socketio WSGI application
     pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server
     
+<<<<<<< HEAD:autodrive_devkit/autodrive_f1tenth/autodrive_bridge.py
     autodrive_bridge.destroy_node() # Explicitly destroy the node
+=======
+    autodrive_incoming_bridge.destroy_node() # Explicitly destroy the node
+    autodrive_outgoing_bridge.destroy_node() # Explicitly destroy the node
+>>>>>>> 562b2e5690b3e3b25645e24e9f87ffabee6e7953:autodrive_devkit/autodrive_f1tenth/autodrive_incoming_bridge.py
     rclpy.shutdown() # Shutdown this context
 
 ################################################################################
 
 if __name__ == '__main__':
+<<<<<<< HEAD:autodrive_devkit/autodrive_f1tenth/autodrive_bridge.py
     main() # Call main function of AutoDRIVE ROS 2 bridge
+=======
+    main() # Call main function of AutoDRIVE Ecosystem ROS 2 incoming bridge
+>>>>>>> 562b2e5690b3e3b25645e24e9f87ffabee6e7953:autodrive_devkit/autodrive_f1tenth/autodrive_incoming_bridge.py
