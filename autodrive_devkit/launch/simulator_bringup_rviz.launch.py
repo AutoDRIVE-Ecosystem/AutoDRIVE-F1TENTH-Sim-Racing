@@ -39,13 +39,6 @@ def generate_launch_description():
             output='screen',
         ),
         Node(
-            package='autodrive_f1tenth',
-            executable='autodrive_outgoing_bridge',
-            name='autodrive_outgoing_bridge',
-            emulate_tty=True,
-            output='screen',
-        ),
-        Node(
             package='rviz2',
             executable='rviz2',
             name='rviz',
