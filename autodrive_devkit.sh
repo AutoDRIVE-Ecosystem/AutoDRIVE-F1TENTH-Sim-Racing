@@ -5,5 +5,11 @@ set -e
 source /opt/ros/foxy/setup.bash
 source /home/autodrive_devkit/install/setup.bash
 
-# Launch AutoDRIVE Devkit (ROS 2 API)
-ros2 launch autodrive_f1tenth simulator_bringup_rviz.launch.py
+# AutoDRIVE Devkit Workspace
+cd /home/autodrive_devkit
+
+# Launch AutoDRIVE Devkit with GUI
+# ros2 launch autodrive_f1tenth simulator_bringup_rviz.launch.py
+
+# Launch AutoDRIVE Devkit Headless
+# ros2 launch autodrive_f1tenth simulator_bringup_headless.launch.py

@@ -30,7 +30,7 @@
 
 # ROS 2 module imports
 import rclpy # ROS 2 client library (rcl) for Python (built on rcl C API)
-from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy # Ouality of Service (tune communication between nodes)
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy # Quality of Service (tune communication between nodes)
 import tf2_ros # ROS bindings for tf2 library to handle transforms
 from std_msgs.msg import Int32, Float32, Header # Int32, Float32 and Header message classes
 from geometry_msgs.msg import Point, TransformStamped # Point and TransformStamped message classes
@@ -121,8 +121,8 @@ def create_laser_scan_msg(lidar_scan_rate, lidar_range_array, lidar_intensity_ar
     ls.angle_min = -2.35619 # Minimum angle of laser scan (0 degrees)
     ls.angle_max = 2.35619 # Maximum angle of laser scan (270 degrees)
     ls.angle_increment = 0.004363323 # Angular resolution of laser scan (0.25 degree)
-    ls.time_increment = (1 / lidar_scan_rate) / 360 # Time required to scan 1 degree
-    ls.scan_time = ls.time_increment * 360 # Time required to complete a scan of 360 degrees
+    ls.time_increment = (1/lidar_scan_rate)/1080 # Time required to scan 1 degree
+    ls.scan_time = 1/lidar_scan_rate # Time required to complete a scan
     ls.range_min = 0.06 # Minimum sensor range (in meters)
     ls.range_max = 10.0 # Maximum sensor range (in meters)
     ls.ranges = lidar_range_array
@@ -307,7 +307,7 @@ def main():
     qos_profile = QoSProfile( # Ouality of Service profile
         reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE, # Reliable (not best effort) communication
         history=QoSHistoryPolicy.RMW_QOS_POLICY_HISTORY_KEEP_LAST, # Keep/store only up to last N samples
-        depth=1 # Queue (buffer) size/depth (only honored if the “history” policy was set to “keep last”)
+        depth=0 # Queue (buffer) size/depth (only honored if the “history” policy was set to “keep last”)
         )
     cv_bridge = CvBridge() # ROS bridge object for opencv library to handle image data
     publishers = {e.name: autodrive_bridge.create_publisher(e.type, e.topic, qos_profile)
@@ -322,7 +322,7 @@ def main():
     subscribers # Avoid unused variable warning
 
     executor = rclpy.executors.SingleThreadedExecutor() # Create executor to control which threads callbacks get executed in
-    executor.add_node(autodrive_bridge) # Add a node whose callbacks should be managed by this executor
+    executor.add_node(autodrive_bridge) # Add node whose callbacks should be managed by this executor
 
     process = Thread(target=executor.spin, daemon=True) # Runs callbacks in the thread
     process.start() # Activate the thread as demon (background process) and prompt it to the target function (spin the executor)
