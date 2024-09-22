@@ -29,7 +29,7 @@ docker build --tag autodriveecosystem/autodrive_f1tenth_sim:<TAG> -f autodrive_s
 
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
+docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 ### Push:
@@ -37,7 +37,7 @@ docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /t
 1. Run the image you created in the previous step inside a container:
 ```bash
 xhost local:root
-docker run --name autodrive_f1tenth_sim --rm -it --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
+docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 2. In a new terminal window, list all containers and make a note of the desired `CONTAINER ID`:
