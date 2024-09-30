@@ -124,17 +124,19 @@ docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --networ
 
 4. Begin screen recording (tested with [OBS Studio](https://obsproject.com)).
 
-5. Execute a new bash session within the team's container and start recording all data streams:
+5. Execute a new bash session within the team's container, launch `rqtgraph` for inspection and start recording all data streams:
 ```bash
 docker exec -it autodrive_f1tenth_api bash
 ros2 bag record -o qualification.bag
+rqtgraph
 ```
 
 6. Enable the communication bridge between simulator and devkit to start the race.
 
-7. After the race completion, kill the data recording as well as screen recording processes, and copy the `bag` file to the host workstation:
+7. After the race completion, kill the `rqtgraph`, data recording as well as screen recording processes, and copy the `rosgraph` and `rosbag` file to the host workstation:
 ```bash
 docker cp autodrive_f1tenth_api:/home/autodrive_devkit/qualification.bag /home/<USERNAME>
+docker cp autodrive_f1tenth_api:/home/autodrive_devkit/rosgraph.png /home/<USERNAME>
 ```
 
 ## Generally Helpful Docker Tips
