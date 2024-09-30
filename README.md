@@ -103,7 +103,42 @@ docker login
 docker push autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
+## Competition Execution
+
+1. Pull the team's image:
+```bash
+docker pull <TEAM_USERNAME>/<IMAGE_NAME>:<TAG>
+```
+
+2. Run the team's image you pulled in the previous step inside a container:
+```bash
+xhost local:root
+docker run --name autodrive_f1tenth_api --rm -it --entrypoint /bin/bash --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all <TEAM_USERNAME>/<IMAGE_NAME>:<TAG>
+```
+
+3. Run the simulator image inside a container, set graphics to `Ultra` quality and vehicle in `Autonomous` mode:
+```bash
+xhost local:root
+docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --network=host --ipc=host -v /tmp/.X11-unix:/tmp.X11-umix:rw --env DISPLAY --privileged --gpus all autodriveecosystem/autodrive_f1tenth_sim:<TAG>
+```
+
+4. Begin screen recording (tested with [OBS Studio](https://obsproject.com)).
+
+5. Execute a new bash session within the team's container and start recording all data streams:
+```bash
+docker exec -it autodrive_f1tenth_api bash
+ros2 bag record -o qualification.bag
+```
+
+6. Enable the communication bridge between simulator and devkit to start the race.
+
+7. After the race completion, kill the data recording as well as screen recording processes, and copy the `bag` file to the host workstation:
+```bash
+docker cp autodrive_f1tenth_api:/home/autodrive_devkit/qualification.bag /home/<USERNAME>
+```
+
 ## Generally Helpful Docker Tips
+
 1. To access the container while it is running, execute the following command in a new terminal window to start a new bash session inside the container:
 ```bash
 docker exec -it <CONTAINER NAME> bash
