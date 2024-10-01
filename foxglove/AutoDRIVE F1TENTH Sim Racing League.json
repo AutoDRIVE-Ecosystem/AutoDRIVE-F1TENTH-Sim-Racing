@@ -1,0 +1,199 @@
+{
+  "configById": {
+    "Image!3mnp456": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/autodrive/f1tenth_1/front_camera"
+      },
+      "foxglovePanelTitle": "Vehicle Camera"
+    },
+    "3D!18i6zy7": {
+      "layers": {
+        "845139cb-26bc-40b3-8161-8ab60af4baf5": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "845139cb-26bc-40b3-8161-8ab60af4baf5",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        }
+      },
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {
+        "enableStats": true,
+        "meshUpAxis": "y_up"
+      },
+      "transforms": {},
+      "topics": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "Plot!2knkptk": {
+      "paths": [],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240
+    },
+    "Gauge!404t1lv": {
+      "path": "/autodrive/f1tenth_1/speed.data",
+      "minValue": 0,
+      "maxValue": 25,
+      "colorMap": "red-yellow-green",
+      "colorMode": "colormap",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": true,
+      "foxglovePanelTitle": "Vehicle Speed"
+    },
+    "Indicator!2e4orhp": {
+      "path": "/autodrive/f1tenth_1/collision_count",
+      "style": "bulb",
+      "fallbackColor": "#ff0000",
+      "fallbackLabel": "Disqualified",
+      "rules": [
+        {
+          "operator": ">",
+          "rawValue": "10",
+          "color": "#68e24a",
+          "label": "Qualified"
+        }
+      ],
+      "foxglovePanelTitle": "Collision Check"
+    },
+    "RawMessages!os6rgs": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/autodrive/f1tenth_1/best_lap_time"
+    },
+    "Table!4aud81l": {
+      "topicPath": "/autodrive/f1tenth_1/best_lap_time"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "first": {
+      "first": "Image!3mnp456",
+      "second": {
+        "first": "3D!18i6zy7",
+        "second": "Plot!2knkptk",
+        "direction": "row",
+        "splitPercentage": 70
+      },
+      "direction": "row",
+      "splitPercentage": 20.07073386383731
+    },
+    "second": {
+      "first": {
+        "first": "Gauge!404t1lv",
+        "second": "Indicator!2e4orhp",
+        "direction": "column"
+      },
+      "second": {
+        "first": "RawMessages!os6rgs",
+        "second": "Table!4aud81l",
+        "direction": "row"
+      },
+      "direction": "row",
+      "splitPercentage": 20.07073386383731
+    },
+    "direction": "column"
+  }
+}
