@@ -95,7 +95,7 @@
           "value": "/autodrive/f1tenth_1/imu.linear_acceleration.y",
           "enabled": true,
           "color": "#4e98e2",
-          "lineSize": 1,
+          "lineSize": 5,
           "showLine": false,
           "label": "Acceleration (x, y)"
         }
@@ -107,8 +107,8 @@
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
-      "isSynced": false,
-      "xAxisVal": "custom",
+      "isSynced": true,
+      "xAxisVal": "currentCustom",
       "sidebarDimension": 240,
       "foxglovePanelTitle": "G-G Diagram (m/s²)",
       "xAxisPath": {
@@ -511,7 +511,7 @@
             "first": "Plot!2knkptk",
             "second": "Plot!2gmyihb",
             "direction": "column",
-            "splitPercentage": 41.604010025062664
+            "splitPercentage": 44.51330869558966
           },
           "second": {
             "first": "Plot!1vxgg57",
