@@ -50,7 +50,7 @@ docker ps -a
 
 3. Commit changes to Docker Hub:
 ```bash
-docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_sim:<TAG>
+docker commit -m "AutoDRIVE-F1TENTH-Sim-Racing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 4. Login to Docker Hub:
@@ -96,7 +96,7 @@ docker ps -a
 
 3. Commit changes to Docker Hub:
 ```bash
-docker commit -m "AutoDRIVE-F1TENTH-SimRacing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_api:<TAG>
+docker commit -m "AutoDRIVE-F1TENTH-Sim-Racing" -a "AutoDRIVE Ecosystem" <CONTAINER ID> autodriveecosystem/autodrive_f1tenth_api:<TAG>
 ```
 
 4. Login to Docker Hub:
