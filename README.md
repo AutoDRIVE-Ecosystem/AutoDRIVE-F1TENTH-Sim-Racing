@@ -19,6 +19,9 @@ F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
 
 ## AutoDRIVE Simulator Container
 
+> [!NOTE]
+> The simulator executable must be placed inside [`/autodrive_simulator`](/autodrive_simulator) directory. This repository ships with an examplar working simulator executable, which can be updated as necessary.
+
 ### Build:
 
 ```bash
@@ -61,6 +64,9 @@ docker push autodriveecosystem/autodrive_f1tenth_sim:<TAG>
 ```
 
 ## AutoDRIVE Devkit Container
+
+> [!NOTE]
+> The devkit package(s) must be placed inside [`/autodrive_devkit`](/autodrive_devkit) directory. This repository ships with an examplar working devkit package, which can be updated as necessary.
 
 ### Build:
 
