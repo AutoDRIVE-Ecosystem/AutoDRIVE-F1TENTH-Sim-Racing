@@ -133,7 +133,8 @@ docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --networ
 5. Execute a new bash session within the team's container, launch `rqtgraph` for inspection and start recording all data streams:
 ```bash
 docker exec -it autodrive_f1tenth_api bash
-ros2 bag record -o qualification.bag
+ros2 bag record -a -o qualification.bag
+ros2 bag record -a -o competition.bag
 rqtgraph
 ```
 
@@ -142,6 +143,7 @@ rqtgraph
 7. After the race completion, kill the `rqtgraph`, data recording as well as screen recording processes, and copy the `rosgraph` and `rosbag` file to the host workstation:
 ```bash
 docker cp autodrive_f1tenth_api:/home/autodrive_devkit/qualification.bag /home/<USERNAME>
+docker cp autodrive_f1tenth_api:/home/autodrive_devkit/competition.bag /home/<USERNAME>
 docker cp autodrive_f1tenth_api:/home/autodrive_devkit/rosgraph.png /home/<USERNAME>
 ```
 
