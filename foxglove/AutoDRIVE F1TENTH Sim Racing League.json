@@ -100,8 +100,8 @@
           "label": "Acceleration (x, y)"
         }
       ],
-      "minYValue": -9.81,
-      "maxYValue": 9.81,
+      "minYValue": -10,
+      "maxYValue": 10,
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
@@ -114,8 +114,8 @@
       "xAxisPath": {
         "value": "/autodrive/f1tenth_1/imu.linear_acceleration.x"
       },
-      "minXValue": -9.81,
-      "maxXValue": 9.81
+      "minXValue": -10,
+      "maxXValue": 10
     },
     "3D!18i6zy7": {
       "layers": {
@@ -144,13 +144,13 @@
       },
       "cameraState": {
         "perspective": true,
-        "distance": 9.265824603191712,
-        "phi": 55.5310344827564,
-        "thetaOffset": 49.46896551724323,
+        "distance": 13.268408625774834,
+        "phi": 53.27633719674323,
+        "thetaOffset": 50.220531279248355,
         "targetOffset": [
-          -1.5305783614541768,
-          -3.581864488582856,
-          4.744117287624005e-17
+          0.7101475235284765,
+          -4.681680214665883,
+          2.9548788637775104e-17
         ],
         "target": [
           0,
