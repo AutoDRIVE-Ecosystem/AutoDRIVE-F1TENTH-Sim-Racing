@@ -134,6 +134,7 @@ docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --networ
 ```bash
 docker exec -it autodrive_f1tenth_api bash
 ros2 bag record -a -o qualification.bag
+ros2 bag record -a -o competition.bag
 rqtgraph
 ```
 
