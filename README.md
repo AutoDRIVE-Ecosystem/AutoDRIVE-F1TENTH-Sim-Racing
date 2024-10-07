@@ -133,7 +133,7 @@ docker run --name autodrive_f1tenth_sim --rm -it --entrypoint /bin/bash --networ
 5. Execute a new bash session within the team's container, launch `rqtgraph` for inspection and start recording all data streams:
 ```bash
 docker exec -it autodrive_f1tenth_api bash
-ros2 bag record -o qualification.bag
+ros2 bag record -a -o qualification.bag
 rqtgraph
 ```
 
