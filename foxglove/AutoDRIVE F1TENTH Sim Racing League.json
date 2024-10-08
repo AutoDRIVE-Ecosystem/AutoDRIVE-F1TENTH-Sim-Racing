@@ -82,10 +82,10 @@
       "colorMap": "red-yellow-green",
       "colorMode": "gradient",
       "gradient": [
-        "#0000ff",
-        "#ff00ff"
+        "#ff00ffff",
+        "#0000ffff"
       ],
-      "reverse": false,
+      "reverse": true,
       "foxglovePanelTitle": "Steering"
     },
     "Plot!2o3cq5y": {
@@ -144,13 +144,13 @@
       },
       "cameraState": {
         "perspective": true,
-        "distance": 13.268408625774834,
-        "phi": 53.27633719674323,
-        "thetaOffset": 50.220531279248355,
+        "distance": 9.753499582304713,
+        "phi": 51.02163991072997,
+        "thetaOffset": 49.46896551724533,
         "targetOffset": [
-          0.7101475235284765,
-          -4.681680214665883,
-          2.9548788637775104e-17
+          -1.4186034026913077,
+          -3.5815094029978187,
+          3.805716028324808e-17
         ],
         "target": [
           0,
