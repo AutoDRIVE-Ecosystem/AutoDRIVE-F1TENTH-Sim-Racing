@@ -52,7 +52,7 @@
     "Gauge!404t1lv": {
       "path": "/autodrive/f1tenth_1/speed.data",
       "minValue": 0,
-      "maxValue": 3,
+      "maxValue": 7,
       "colorMap": "red-yellow-green",
       "colorMode": "colormap",
       "gradient": [
@@ -82,10 +82,10 @@
       "colorMap": "red-yellow-green",
       "colorMode": "gradient",
       "gradient": [
-        "#ff00ffff",
-        "#0000ffff"
+        "#0000ffff",
+        "#ff0000ff"
       ],
-      "reverse": true,
+      "reverse": false,
       "foxglovePanelTitle": "Steering"
     },
     "Plot!2o3cq5y": {
@@ -144,13 +144,13 @@
       },
       "cameraState": {
         "perspective": true,
-        "distance": 9.753499582304713,
-        "phi": 51.02163991072997,
-        "thetaOffset": 49.46896551724533,
+        "distance": 13.26840862577156,
+        "phi": 54.02790295874538,
+        "thetaOffset": 48.75782881002135,
         "targetOffset": [
-          -1.4186034026913077,
-          -3.5815094029978187,
-          3.805716028324808e-17
+          1.0986293210697367,
+          -4.5789108068008035,
+          -7.041505556996897e-17
         ],
         "target": [
           0,
@@ -373,12 +373,6 @@
       "sidebarDimension": 240,
       "foxglovePanelTitle": "Linear Acceleration (m/s²)"
     },
-    "RosOut!3a6n9i5": {
-      "searchTerms": [],
-      "minLogLevel": 1,
-      "nameFilter": {},
-      "foxglovePanelTitle": "Race Log"
-    },
     "RawMessages!os6rgs": {
       "diffEnabled": false,
       "diffMethod": "custom",
@@ -438,6 +432,66 @@
         }
       ],
       "foxglovePanelTitle": "Race Qualification"
+    },
+    "Plot!26x9len": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/autodrive/f1tenth_1/throttle.data",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Throttle"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Throttle (norm%)"
+    },
+    "Plot!2y7amep": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/autodrive/f1tenth_1/steering.data",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Steering"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Steering (norm%)"
+    },
+    "Plot!42ueddx": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/autodrive/f1tenth_1/speed.data",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Speed"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Speed (m/s)"
     },
     "Plot!255iugf": {
       "paths": [
@@ -504,23 +558,23 @@
           "first": "3D!18i6zy7",
           "second": "StateTransitions!skq076",
           "direction": "column",
-          "splitPercentage": 72.09631728045326
+          "splitPercentage": 72.10982658959537
         },
         "second": {
           "first": {
             "first": "Plot!2knkptk",
             "second": "Plot!2gmyihb",
             "direction": "column",
-            "splitPercentage": 44.51330869558966
+            "splitPercentage": 46.45892351274789
           },
           "second": {
             "first": "Plot!1vxgg57",
             "second": "Plot!1idgrqv",
             "direction": "column",
-            "splitPercentage": 49.42939741250283
+            "splitPercentage": 50.15197568389059
           },
           "direction": "column",
-          "splitPercentage": 52.18543046357617
+          "splitPercentage": 52.45664739884393
         },
         "direction": "row",
         "splitPercentage": 53.7568306010929
@@ -530,35 +584,44 @@
     },
     "second": {
       "first": {
-        "first": "RosOut!3a6n9i5",
-        "second": {
-          "first": {
-            "first": "RawMessages!os6rgs",
-            "second": {
-              "first": "RawMessages!1xpmrqn",
-              "second": "RawMessages!391tcg2",
-              "direction": "column"
-            },
-            "direction": "column",
-            "splitPercentage": 33.920704845815
-          },
+        "first": {
+          "first": "RawMessages!os6rgs",
           "second": {
-            "first": "Indicator!2upo9en",
-            "second": "Indicator!2e4orhp",
-            "direction": "column",
-            "splitPercentage": 48.017621145374484
+            "first": "RawMessages!1xpmrqn",
+            "second": "RawMessages!391tcg2",
+            "direction": "column"
           },
-          "direction": "row",
-          "splitPercentage": 60.64516129032258
+          "direction": "column",
+          "splitPercentage": 33.920704845815
+        },
+        "second": {
+          "first": "Indicator!2upo9en",
+          "second": "Indicator!2e4orhp",
+          "direction": "column"
         },
         "direction": "row",
-        "splitPercentage": 48.11715481171548
+        "splitPercentage": 60.86956521739128
       },
-      "second": "Plot!255iugf",
+      "second": {
+        "first": {
+          "first": "Plot!26x9len",
+          "second": "Plot!2y7amep",
+          "direction": "column",
+          "splitPercentage": 44.39834024896266
+        },
+        "second": {
+          "first": "Plot!42ueddx",
+          "second": "Plot!255iugf",
+          "direction": "column",
+          "splitPercentage": 44.39834024896266
+        },
+        "direction": "row",
+        "splitPercentage": 44.3996776792909
+      },
       "direction": "row",
-      "splitPercentage": 63.395225464190986
+      "splitPercentage": 34.16445623342175
     },
     "direction": "column",
-    "splitPercentage": 75.66988210075026
+    "splitPercentage": 74.16934619506966
   }
 }
