@@ -2,7 +2,7 @@
 set -e
 
 # Setup development environment
-source /opt/ros/foxy/setup.bash
+source /opt/ros/humble/setup.bash
 source /home/autodrive_devkit/install/setup.bash
 
 # AutoDRIVE Devkit Workspace

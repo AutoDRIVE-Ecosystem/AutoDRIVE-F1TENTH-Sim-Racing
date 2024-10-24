@@ -5,7 +5,7 @@
 ####################################################
 
 # Set base image
-FROM osrf/ros:foxy-desktop
+FROM osrf/ros:humble-desktop
 
 # Install Debian packages
 RUN apt update \
@@ -31,8 +31,8 @@ RUN pip3 install Flask==1.1.1
 RUN pip3 install Flask-SocketIO==4.1.0
 RUN pip3 install python-socketio==4.2.0
 RUN pip3 install python-engineio==3.13.0
-RUN pip3 install greenlet==1.0.0
-RUN pip3 install gevent==21.1.2
+RUN pip3 install greenlet==1.1.0
+RUN pip3 install gevent==21.12.0
 RUN pip3 install gevent-websocket==0.10.1
 RUN pip3 install Jinja2==3.0.3
 RUN pip3 install itsdangerous==2.0.1
@@ -51,7 +51,7 @@ RUN apt update --fix-missing \
 # Copy AutoDRIVE Devkit (ROS 2 API)
 COPY autodrive_devkit/. /home/autodrive_devkit/src/autodrive_devkit
 RUN cd /home/autodrive_devkit && colcon build
-RUN /bin/bash -c 'echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc' \
+RUN /bin/bash -c 'echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc' \
     && /bin/bash -c 'echo "source /home/autodrive_devkit/install/setup.bash" >> ~/.bashrc' \
     && /bin/bash -c 'source ~/.bashrc'
 

@@ -34,7 +34,15 @@ from geometry_msgs.msg import Point # Point message class
 from sensor_msgs.msg import JointState, Imu, LaserScan, Image # JointState, Imu, LaserScan and Image message classes
 
 # Python mudule imports
-from attrdict import AttrDict # Mapping objects that allow their elements to be accessed both as keys and as attributes
+try: # Mapping objects that allow their elements to be accessed both as keys and as attributes
+    from attrdict import AttrDict
+except ImportError: # attrdict broken in Python 3.10 and not maintained
+    # Monkey patch collections
+    import collections
+    import collections.abc
+    for type_name in collections.abc.__all__:
+        setattr(collections, type_name, getattr(collections.abc, type_name))
+    from attrdict import AttrDict
 
 ################################################################################
 
