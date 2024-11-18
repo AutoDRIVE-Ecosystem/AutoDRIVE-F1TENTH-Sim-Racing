@@ -2,7 +2,7 @@
 
 ################################################################################
 
-# Copyright (c) 2023, Tinker Twins
+# Copyright (c) 2024, Tinker Twins
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,16 @@
 
 # ROS 2 module imports
 import rclpy # ROS 2 client library (rcl) for Python (built on rcl C API)
-from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy # Quality of Service (tune communication between nodes)
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy # Quality of Service (tune communication between nodes)
 import tf2_ros # ROS bindings for tf2 library to handle transforms
 from std_msgs.msg import Int32, Float32, Header # Int32, Float32 and Header message classes
 from geometry_msgs.msg import Point, TransformStamped # Point and TransformStamped message classes
 from sensor_msgs.msg import JointState, Imu, LaserScan, Image # JointState, Imu, LaserScan and Image message classes
 from tf_transformations import quaternion_from_euler # Euler angle representation to quaternion representation
-from ament_index_python.packages import get_package_share_directory # Access package's shared directory path
-from threading import Thread
+from threading import Thread # Thread-based parallelism
 
 # Python mudule imports
-from cv_bridge import CvBridge, CvBridgeError # ROS bridge for opencv library to handle images
+from cv_bridge import CvBridge # ROS bridge for opencv library to handle images
 from gevent import pywsgi # Pure-Python gevent-friendly WSGI server
 from geventwebsocket.handler import WebSocketHandler # Handler for WebSocket messages and lifecycle events
 import socketio # Socket.IO realtime client and server
@@ -48,13 +47,13 @@ import numpy as np # Scientific computing
 import base64 # Base64 binary-to-text encoding/decoding scheme
 from io import BytesIO # Manipulate bytes data in memory
 from PIL import Image # Python Imaging Library's (PIL's) Image module
-import configparser # Parsing shared configuration file(s)
+import gzip # Inbuilt module to compress and decompress data and files
 import autodrive_f1tenth.config as config # AutoDRIVE Ecosystem ROS 2 configuration for F1TENTH vehicle
 
 ################################################################################
 
 # Global declarations
-global autodrive_bridge, cv_bridge, publishers
+global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
 global throttle_command, steering_command
 
 # Initialize vehicle control commands
@@ -65,18 +64,15 @@ steering_command = config.steering_command
 # ROS 2 MESSAGE GENERATING FUNCTIONS
 #########################################################
 
-def create_int_msg(val):
-    i = Int32()
+def create_int_msg(i, val):
     i.data = int(val)
     return i
 
-def create_float_msg(val):
-    f = Float32()
+def create_float_msg(f, val):
     f.data = float(val)
     return f
 
-def create_joint_state_msg(joint_angle, joint_name, frame_id):
-    js = JointState()
+def create_joint_state_msg(js, joint_angle, joint_name, frame_id):
     js.header = Header()
     js.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     js.header.frame_id = frame_id
@@ -86,15 +82,13 @@ def create_joint_state_msg(joint_angle, joint_name, frame_id):
     js.effort = []
     return js
 
-def create_point_msg(position):
-    p = Point()
+def create_point_msg(p, position):
     p.x = position[0]
     p.y = position[1]
     p.z = position[2]
     return p
 
-def create_imu_msg(orientation_quaternion, angular_velocity, linear_acceleration):
-    imu = Imu()
+def create_imu_msg(imu, orientation_quaternion, angular_velocity, linear_acceleration):
     imu.header = Header()
     imu.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     imu.header.frame_id = 'imu'
@@ -113,8 +107,7 @@ def create_imu_msg(orientation_quaternion, angular_velocity, linear_acceleration
     imu.linear_acceleration_covariance = [0.0025, 0.0, 0.0, 0.0, 0.0025, 0.0, 0.0, 0.0, 0.0025]
     return imu
 
-def create_laser_scan_msg(lidar_scan_rate, lidar_range_array, lidar_intensity_array):
-    ls = LaserScan()
+def create_laserscan_msg(ls, lidar_scan_rate, lidar_range_array, lidar_intensity_array):
     ls.header = Header()
     ls.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     ls.header.frame_id = 'lidar'
@@ -129,16 +122,14 @@ def create_laser_scan_msg(lidar_scan_rate, lidar_range_array, lidar_intensity_ar
     ls.intensities = lidar_intensity_array
     return ls
 
-def create_image_msg(image_array, frame_id):
-    img = cv_bridge.cv2_to_imgmsg(image_array, encoding="rgb8")
+def create_image_msg(img, frame_id):
+    img = cv_bridge.cv2_to_imgmsg(img, encoding="rgb8")
     img.header = Header()
     img.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     img.header.frame_id = frame_id
     return img
 
-def broadcast_transform(child_frame_id, parent_frame_id, position_tf, orientation_tf):
-    tb = tf2_ros.TransformBroadcaster(autodrive_bridge)
-    tf = TransformStamped()
+def broadcast_transform(tf, tf_broadcaster, child_frame_id, parent_frame_id, position_tf, orientation_tf):
     tf.header.stamp = autodrive_bridge.get_clock().now().to_msg()
     tf.header.frame_id = parent_frame_id
     tf.child_frame_id = child_frame_id
@@ -149,7 +140,19 @@ def broadcast_transform(child_frame_id, parent_frame_id, position_tf, orientatio
     tf.transform.rotation.y = orientation_tf[1] # Quat Y
     tf.transform.rotation.z = orientation_tf[2] # Quat Z
     tf.transform.rotation.w = orientation_tf[3] # Quat W
-    tb.sendTransform(tf)
+    tf_broadcaster.sendTransform(tf)
+
+#########################################################
+# ROS 2 MESSAGE DEFINITIONS
+#########################################################
+
+msg_int32 = Int32()
+msg_float32 = Float32()
+msg_jointstate = JointState()
+msg_point = Point()
+msg_imu = Imu()
+msg_laserscan = LaserScan()
+msg_transform = TransformStamped()
 
 #########################################################
 # ROS 2 PUBLISHER FUNCTIONS
@@ -158,42 +161,42 @@ def broadcast_transform(child_frame_id, parent_frame_id, position_tf, orientatio
 # VEHICLE DATA PUBLISHER FUNCTIONS
 
 def publish_actuator_feedbacks(throttle, steering):
-    publishers['pub_throttle'].publish(create_float_msg(throttle))
-    publishers['pub_steering'].publish(create_float_msg(steering))
+    publishers['pub_throttle'].publish(create_float_msg(msg_float32, throttle))
+    publishers['pub_steering'].publish(create_float_msg(msg_float32, steering))
 
 def publish_speed_data(speed):
-    publishers['pub_speed'].publish(create_float_msg(speed))
+    publishers['pub_speed'].publish(create_float_msg(msg_float32, speed))
 
 def publish_encoder_data(encoder_angles):
-    publishers['pub_left_encoder'].publish(create_joint_state_msg(encoder_angles[0], "left_encoder", "left_encoder"))
-    publishers['pub_right_encoder'].publish(create_joint_state_msg(encoder_angles[1], "right_encoder", "right_encoder"))
+    publishers['pub_left_encoder'].publish(create_joint_state_msg(msg_jointstate, encoder_angles[0], "left_encoder", "left_encoder"))
+    publishers['pub_right_encoder'].publish(create_joint_state_msg(msg_jointstate, encoder_angles[1], "right_encoder", "right_encoder"))
 
 def publish_ips_data(position):
-    publishers['pub_ips'].publish(create_point_msg(position))
+    publishers['pub_ips'].publish(create_point_msg(msg_point, position))
 
 def publish_imu_data(orientation_quaternion, angular_velocity, linear_acceleration):
-    publishers['pub_imu'].publish(create_imu_msg(orientation_quaternion, angular_velocity, linear_acceleration))
+    publishers['pub_imu'].publish(create_imu_msg(msg_imu, orientation_quaternion, angular_velocity, linear_acceleration))
 
 def publish_lidar_scan(lidar_scan_rate, lidar_range_array, lidar_intensity_array):
-    publishers['pub_lidar'].publish(create_laser_scan_msg(lidar_scan_rate, lidar_range_array.tolist(), lidar_intensity_array.tolist()))
+    publishers['pub_lidar'].publish(create_laserscan_msg(msg_laserscan, lidar_scan_rate, lidar_range_array.tolist(), lidar_intensity_array.tolist()))
 
 def publish_camera_images(front_camera_image):
     publishers['pub_front_camera'].publish(create_image_msg(front_camera_image, "front_camera"))
 
 def publish_lap_count_data(lap_count):
-    publishers['pub_lap_count'].publish(create_int_msg(lap_count))
+    publishers['pub_lap_count'].publish(create_int_msg(msg_int32, lap_count))
 
 def publish_lap_time_data(lap_time):
-    publishers['pub_lap_time'].publish(create_float_msg(lap_time))
+    publishers['pub_lap_time'].publish(create_float_msg(msg_float32, lap_time))
 
 def publish_last_lap_time_data(last_lap_time):
-    publishers['pub_last_lap_time'].publish(create_float_msg(last_lap_time))
+    publishers['pub_last_lap_time'].publish(create_float_msg(msg_float32, last_lap_time))
 
 def publish_best_lap_time_data(best_lap_time):
-    publishers['pub_best_lap_time'].publish(create_float_msg(best_lap_time))
+    publishers['pub_best_lap_time'].publish(create_float_msg(msg_float32, best_lap_time))
 
 def publish_collision_count_data(collision_count):
-    publishers['pub_collision_count'].publish(create_int_msg(collision_count))
+    publishers['pub_collision_count'].publish(create_int_msg(msg_int32, collision_count))
 
 #########################################################
 # ROS 2 SUBSCRIBER CALLBACKS
@@ -225,11 +228,8 @@ def connect(sid, environ):
 @sio.on('Bridge')
 def bridge(sid, data):
     # Global declarations
-    global autodrive_bridge, cv_bridge, publishers
+    global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
     global throttle_command, steering_command
-
-    # Get package's shared directory path
-    package_share_directory = get_package_share_directory('autodrive_f1tenth')
 
     # Wait for data to become available
     if data:
@@ -255,21 +255,21 @@ def bridge(sid, data):
         linear_acceleration = np.fromstring(data["V1 Linear Acceleration"], dtype=float, sep=' ')
         publish_imu_data(orientation_quaternion, angular_velocity, linear_acceleration)
         # Cooordinate transforms
-        broadcast_transform("f1tenth_1", "world", position, orientation_quaternion) # Vehicle frame defined at center of rear axle
-        broadcast_transform("left_encoder", "f1tenth_1", np.asarray([0.0, 0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[0]%6.283, 0.0))
-        broadcast_transform("right_encoder", "f1tenth_1", np.asarray([0.0, -0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[1]%6.283, 0.0))
-        broadcast_transform("ips", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform("imu", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform("lidar", "f1tenth_1", np.asarray([0.2733, 0.0, 0.096]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform("front_camera", "f1tenth_1", np.asarray([-0.015, 0.0, 0.15]), np.asarray([0, 0.0871557, 0, 0.9961947]))
-        broadcast_transform("front_left_wheel", "f1tenth_1", np.asarray([0.33, 0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537-2*0.0765*np.tan(steering)))))
-        broadcast_transform("front_right_wheel", "f1tenth_1", np.asarray([0.33, -0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537+2*0.0765*np.tan(steering)))))
-        broadcast_transform("rear_left_wheel", "f1tenth_1", np.asarray([0.0, 0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[0]%6.283, 0.0))
-        broadcast_transform("rear_right_wheel", "f1tenth_1", np.asarray([0.0, -0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[1]%6.283, 0.0))
+        broadcast_transform(msg_transform, transform_broadcaster, "f1tenth_1", "world", position, orientation_quaternion) # Vehicle frame defined at center of rear axle
+        broadcast_transform(msg_transform, transform_broadcaster, "left_encoder", "f1tenth_1", np.asarray([0.0, 0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[0]%6.283, 0.0))
+        broadcast_transform(msg_transform, transform_broadcaster, "right_encoder", "f1tenth_1", np.asarray([0.0, -0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[1]%6.283, 0.0))
+        broadcast_transform(msg_transform, transform_broadcaster, "ips", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+        broadcast_transform(msg_transform, transform_broadcaster, "imu", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+        broadcast_transform(msg_transform, transform_broadcaster, "lidar", "f1tenth_1", np.asarray([0.2733, 0.0, 0.096]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+        broadcast_transform(msg_transform, transform_broadcaster, "front_camera", "f1tenth_1", np.asarray([-0.015, 0.0, 0.15]), np.asarray([0, 0.0871557, 0, 0.9961947]))
+        broadcast_transform(msg_transform, transform_broadcaster, "front_left_wheel", "f1tenth_1", np.asarray([0.33, 0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537-2*0.0765*np.tan(steering)))))
+        broadcast_transform(msg_transform, transform_broadcaster, "front_right_wheel", "f1tenth_1", np.asarray([0.33, -0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537+2*0.0765*np.tan(steering)))))
+        broadcast_transform(msg_transform, transform_broadcaster, "rear_left_wheel", "f1tenth_1", np.asarray([0.0, 0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[0]%6.283, 0.0))
+        broadcast_transform(msg_transform, transform_broadcaster, "rear_right_wheel", "f1tenth_1", np.asarray([0.0, -0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[1]%6.283, 0.0))
         # LIDAR
         lidar_scan_rate = float(data["V1 LIDAR Scan Rate"])
-        lidar_range_array = np.fromstring(data["V1 LIDAR Range Array"], dtype=float, sep=' ')
-        lidar_intensity_array = np.fromstring(data["V1 LIDAR Intensity Array"], dtype=float, sep=' ')
+        lidar_range_array = np.fromstring(gzip.decompress(base64.b64decode(data["V1 LIDAR Range Array"])).decode('utf-8'), sep='\n')
+        lidar_intensity_array = np.asarray([])
         publish_lidar_scan(lidar_scan_rate, lidar_range_array, lidar_intensity_array)
         # Cameras
         front_camera_image = np.asarray(Image.open(BytesIO(base64.b64decode(data["V1 Front Camera Image"]))))
@@ -298,18 +298,20 @@ def bridge(sid, data):
 
 def main():
     # Global declarations
-    global autodrive_bridge, cv_bridge, publishers
+    global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
     global throttle_command, steering_command
 
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
     autodrive_bridge = rclpy.create_node('autodrive_bridge') # Create ROS 2 node
     qos_profile = QoSProfile( # Ouality of Service profile
-        reliability=QoSReliabilityPolicy.RELIABLE, # Reliable (not best effort) communication
+        durability=QoSDurabilityPolicy.VOLATILE, # Volatile durability with no attempt made to persist samples
+        reliability=QoSReliabilityPolicy.RELIABLE, # Reliable (not best effort) communication to guarantee that samples are delivered
         history=QoSHistoryPolicy.KEEP_LAST, # Keep/store only up to last N samples
         depth=1 # Queue (buffer) size/depth (only honored if the “history” policy was set to “keep last”)
         )
     cv_bridge = CvBridge() # ROS bridge object for opencv library to handle image data
+    transform_broadcaster = tf2_ros.TransformBroadcaster(autodrive_bridge) # Initialize transform broadcaster
     publishers = {e.name: autodrive_bridge.create_publisher(e.type, e.topic, qos_profile)
                   for e in config.pub_sub_dict.publishers} # Publishers
     callbacks = {
@@ -321,7 +323,9 @@ def main():
                    for e in config.pub_sub_dict.subscribers] # Subscribers
     subscribers # Avoid unused variable warning
 
-    executor = rclpy.executors.SingleThreadedExecutor() # Create executor to control which threads callbacks get executed in
+    # If num_threads is not specified then num_threads will be multiprocessing.cpu_count() if it is implemented
+    # Otherwise it will use a single thread
+    executor = rclpy.executors.MultiThreadedExecutor() # Create executor to control which threads callbacks get executed in
     executor.add_node(autodrive_bridge) # Add node whose callbacks should be managed by this executor
 
     process = Thread(target=executor.spin, daemon=True) # Runs callbacks in the thread
@@ -330,6 +334,8 @@ def main():
     app = socketio.WSGIApp(sio) # Create socketio WSGI application
     pywsgi.WSGIServer(('', 4567), app, handler_class=WebSocketHandler).serve_forever() # Deploy as a gevent WSGI server
     
+    # Cleanup
+    executor.shutdown() # Executor shutdown
     autodrive_bridge.destroy_node() # Explicitly destroy the node
     rclpy.shutdown() # Shutdown this context
 

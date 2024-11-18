@@ -53,6 +53,7 @@ COPY autodrive_devkit/. /home/autodrive_devkit/src/autodrive_devkit
 RUN cd /home/autodrive_devkit && colcon build
 RUN /bin/bash -c 'echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc' \
     && /bin/bash -c 'echo "source /home/autodrive_devkit/install/setup.bash" >> ~/.bashrc' \
+    && /bin/bash -c 'echo "export XDG_RUNTIME_DIR='/tmp/runtime-root'" >> ~/.bashrc' \
     && /bin/bash -c 'source ~/.bashrc'
 
 # Set work directory and expose port
