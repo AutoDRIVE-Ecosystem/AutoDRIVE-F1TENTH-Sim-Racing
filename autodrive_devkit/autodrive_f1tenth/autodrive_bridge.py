@@ -54,11 +54,14 @@ import autodrive_f1tenth.config as config # AutoDRIVE Ecosystem ROS 2 configurat
 
 # Global declarations
 global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-global throttle_command, steering_command
+global throttle_command, steering_command, reset_command
 
 # Initialize vehicle control commands
 throttle_command = config.throttle_command
 steering_command = config.steering_command
+
+# Initialize simulation control commands
+reset_command = config.reset_command
 
 #########################################################
 # ROS 2 MESSAGE GENERATING FUNCTIONS
@@ -212,6 +215,10 @@ def callback_steering_command(steering_command_msg):
     global steering_command
     steering_command = float(np.round(steering_command_msg.data, 3))
 
+def callback_reset_command(reset_command_msg):
+    global reset_command
+    reset_command = reset_command_msg.data
+
 #########################################################
 # WEBSOCKET SERVER INFRASTRUCTURE
 #########################################################
@@ -229,7 +236,7 @@ def connect(sid, environ):
 def bridge(sid, data):
     # Global declarations
     global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-    global throttle_command, steering_command
+    global throttle_command, steering_command, reset_command
 
     # Wait for data to become available
     if data:
@@ -290,7 +297,11 @@ def bridge(sid, data):
         # CONTROL COMMANDS
         ########################################################################
         # Vehicle and traffic light control commands
-        sio.emit('Bridge', data={'V1 Throttle': str(throttle_command), 'V1 Steering': str(steering_command)})
+        sio.emit('Bridge', data={'V1 Throttle': str(throttle_command),
+                                 'V1 Steering': str(steering_command),
+                                 'Reset': str(reset_command)
+                                 }
+                )
 
 #########################################################
 # AUTODRIVE ROS 2 BRIDGE INFRASTRUCTURE
@@ -299,7 +310,7 @@ def bridge(sid, data):
 def main():
     # Global declarations
     global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-    global throttle_command, steering_command
+    global throttle_command, steering_command, reset_command
 
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
@@ -318,6 +329,7 @@ def main():
         # Vehicle data subscriber callbacks
         '/autodrive/f1tenth_1/throttle_command': callback_throttle_command,
         '/autodrive/f1tenth_1/steering_command': callback_steering_command,
+        '/autodrive/reset_command': callback_reset_command
     } # Subscriber callback functions
     subscribers = [autodrive_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
                    for e in config.pub_sub_dict.subscribers] # Subscribers

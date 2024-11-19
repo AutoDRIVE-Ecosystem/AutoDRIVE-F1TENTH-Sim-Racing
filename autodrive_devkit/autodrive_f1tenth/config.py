@@ -29,7 +29,7 @@
 ################################################################################
 
 # ROS 2 module imports
-from std_msgs.msg import Int32, Float32 # Int32 and Float32 message classes
+from std_msgs.msg import Int32, Float32, Bool # Int32, Float32 and Bool message classes
 from geometry_msgs.msg import Point # Point message class
 from sensor_msgs.msg import JointState, Imu, LaserScan, Image # JointState, Imu, LaserScan and Image message classes
 
@@ -51,7 +51,8 @@ pub_sub_dict = AttrDict({
     'subscribers': [
         # Vehicle data subscribers
         {'topic':'/autodrive/f1tenth_1/throttle_command', 'type': Float32, 'name': 'sub_throttle_command'},
-        {'topic':'/autodrive/f1tenth_1/steering_command', 'type': Float32, 'name': 'sub_steering_command'}
+        {'topic':'/autodrive/f1tenth_1/steering_command', 'type': Float32, 'name': 'sub_steering_command'},
+        {'topic':'/autodrive/reset_command', 'type': Bool, 'name': 'callback_reset_command'}
     ],
     'publishers': [
         # Vehicle data publishers
@@ -77,3 +78,6 @@ pub_sub_dict = AttrDict({
 # Initialize vehicle control commands
 throttle_command = 0.0 # [-1, 1]
 steering_command = 0.0 # [-1, 1]
+
+# Initialize simulation control commands
+reset_command = False # True or False
