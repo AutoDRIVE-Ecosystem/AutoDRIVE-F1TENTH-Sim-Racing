@@ -49,13 +49,11 @@ except ImportError: # attrdict broken in Python 3.10 and not maintained
 # ROS 2 publishers and subscribers
 pub_sub_dict = AttrDict({
     'subscribers': [
-        # Vehicle data subscribers
         {'topic':'/autodrive/f1tenth_1/throttle_command', 'type': Float32, 'name': 'sub_throttle_command'},
         {'topic':'/autodrive/f1tenth_1/steering_command', 'type': Float32, 'name': 'sub_steering_command'},
         {'topic':'/autodrive/reset_command', 'type': Bool, 'name': 'callback_reset_command'}
     ],
     'publishers': [
-        # Vehicle data publishers
         {'topic': '/autodrive/f1tenth_1/throttle', 'type': Float32, 'name': 'pub_throttle'},
         {'topic': '/autodrive/f1tenth_1/steering', 'type': Float32, 'name': 'pub_steering'},
         {'topic': '/autodrive/f1tenth_1/speed', 'type': Float32, 'name': 'pub_speed'},
