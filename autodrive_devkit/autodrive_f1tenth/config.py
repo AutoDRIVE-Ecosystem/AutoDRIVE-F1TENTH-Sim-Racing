@@ -72,12 +72,3 @@ pub_sub_dict = AttrDict({
         {'topic': '/autodrive/f1tenth_1/collision_count', 'type': Int32, 'name': 'pub_collision_count'}
     ]
 })
-
-################################################################################
-
-# Initialize vehicle control commands
-throttle_command = 0.0 # [-1, 1]
-steering_command = 0.0 # [-1, 1]
-
-# Initialize simulation control commands
-reset_command = False # True or False

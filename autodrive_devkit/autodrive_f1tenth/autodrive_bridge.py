@@ -52,16 +52,40 @@ import autodrive_f1tenth.config as config # AutoDRIVE Ecosystem ROS 2 configurat
 
 ################################################################################
 
+# AutoDRIVE class
+class AutoDRIVE:
+    def __init__(self):
+        # Vehicle data
+        self.id                       = 1
+        self.throttle                 = 0
+        self.steering                 = 0
+        self.speed                    = 0
+        self.encoder_angles           = np.zeros(2, dtype=float)
+        self.position                 = np.zeros(3, dtype=float)
+        self.orientation_quaternion   = np.zeros(4, dtype=float)
+        self.angular_velocity         = np.zeros(3, dtype=float)
+        self.linear_acceleration      = np.zeros(3, dtype=float)
+        self.lidar_scan_rate          = 40
+        self.lidar_range_array        = np.zeros(1080, dtype=float)
+        self.lidar_intensity_array    = np.asarray([])
+        self.front_camera_image       = np.zeros((192, 108, 3), dtype=np.uint8)
+        # Race data
+        self.lap_count       = 0
+        self.lap_time        = 0
+        self.last_lap_time   = 0
+        self.best_lap_time   = 0
+        self.collision_count = 0
+        # Vehicle commands
+        self.throttle_command = 0.0 # [-1, 1]
+        self.steering_command = 0.0 # [-1, 1]
+        # Simulation commands
+        self.reset_command = False # True or False
+
+################################################################################
+
 # Global declarations
 global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-global throttle_command, steering_command, reset_command
-
-# Initialize vehicle control commands
-throttle_command = config.throttle_command
-steering_command = config.steering_command
-
-# Initialize simulation control commands
-reset_command = config.reset_command
+autodrive = AutoDRIVE()
 
 #########################################################
 # ROS 2 MESSAGE GENERATING FUNCTIONS
@@ -235,71 +259,45 @@ def connect(sid, environ):
 @sio.on('Bridge')
 def bridge(sid, data):
     # Global declarations
-    global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-    global throttle_command, steering_command, reset_command
+    global autodrive, autodrive_bridge, cv_bridge, publishers, transform_broadcaster
 
     # Wait for data to become available
     if data:
         ########################################################################
-        # VEHICLE DATA
+        # INCOMMING DATA
         ########################################################################
         # Actuator feedbacks
-        throttle = float(data["V1 Throttle"])
-        steering = float(data["V1 Steering"])
-        publish_actuator_feedbacks(throttle, steering)
+        autodrive.throttle = float(data["V1 Throttle"])
+        autodrive.steering = float(data["V1 Steering"])
         # Speed
-        speed = float(data["V1 Speed"])
-        publish_speed_data(speed)
+        autodrive.speed = float(data["V1 Speed"])
         # Wheel encoders
-        encoder_angles = np.fromstring(data["V1 Encoder Angles"], dtype=float, sep=' ')
-        publish_encoder_data(encoder_angles)
+        autodrive.encoder_angles = np.fromstring(data["V1 Encoder Angles"], dtype=float, sep=' ')
         # IPS
-        position = np.fromstring(data["V1 Position"], dtype=float, sep=' ')
-        publish_ips_data(position)
+        autodrive.position = np.fromstring(data["V1 Position"], dtype=float, sep=' ')
         # IMU
-        orientation_quaternion = np.fromstring(data["V1 Orientation Quaternion"], dtype=float, sep=' ')
-        angular_velocity = np.fromstring(data["V1 Angular Velocity"], dtype=float, sep=' ')
-        linear_acceleration = np.fromstring(data["V1 Linear Acceleration"], dtype=float, sep=' ')
-        publish_imu_data(orientation_quaternion, angular_velocity, linear_acceleration)
-        # Cooordinate transforms
-        broadcast_transform(msg_transform, transform_broadcaster, "f1tenth_1", "world", position, orientation_quaternion) # Vehicle frame defined at center of rear axle
-        broadcast_transform(msg_transform, transform_broadcaster, "left_encoder", "f1tenth_1", np.asarray([0.0, 0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[0]%6.283, 0.0))
-        broadcast_transform(msg_transform, transform_broadcaster, "right_encoder", "f1tenth_1", np.asarray([0.0, -0.12, 0.0]), quaternion_from_euler(0.0, 120*encoder_angles[1]%6.283, 0.0))
-        broadcast_transform(msg_transform, transform_broadcaster, "ips", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform(msg_transform, transform_broadcaster, "imu", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform(msg_transform, transform_broadcaster, "lidar", "f1tenth_1", np.asarray([0.2733, 0.0, 0.096]), np.asarray([0.0, 0.0, 0.0, 1.0]))
-        broadcast_transform(msg_transform, transform_broadcaster, "front_camera", "f1tenth_1", np.asarray([-0.015, 0.0, 0.15]), np.asarray([0, 0.0871557, 0, 0.9961947]))
-        broadcast_transform(msg_transform, transform_broadcaster, "front_left_wheel", "f1tenth_1", np.asarray([0.33, 0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537-2*0.0765*np.tan(steering)))))
-        broadcast_transform(msg_transform, transform_broadcaster, "front_right_wheel", "f1tenth_1", np.asarray([0.33, -0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(steering))/(2*0.141537+2*0.0765*np.tan(steering)))))
-        broadcast_transform(msg_transform, transform_broadcaster, "rear_left_wheel", "f1tenth_1", np.asarray([0.0, 0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[0]%6.283, 0.0))
-        broadcast_transform(msg_transform, transform_broadcaster, "rear_right_wheel", "f1tenth_1", np.asarray([0.0, -0.118, 0.0]), quaternion_from_euler(0.0, encoder_angles[1]%6.283, 0.0))
+        autodrive.orientation_quaternion = np.fromstring(data["V1 Orientation Quaternion"], dtype=float, sep=' ')
+        autodrive.angular_velocity = np.fromstring(data["V1 Angular Velocity"], dtype=float, sep=' ')
+        autodrive.linear_acceleration = np.fromstring(data["V1 Linear Acceleration"], dtype=float, sep=' ')
         # LIDAR
-        lidar_scan_rate = float(data["V1 LIDAR Scan Rate"])
-        lidar_range_array = np.fromstring(gzip.decompress(base64.b64decode(data["V1 LIDAR Range Array"])).decode('utf-8'), sep='\n')
-        lidar_intensity_array = np.asarray([])
-        publish_lidar_scan(lidar_scan_rate, lidar_range_array, lidar_intensity_array)
+        autodrive.lidar_scan_rate = float(data["V1 LIDAR Scan Rate"])
+        autodrive.lidar_range_array = np.fromstring(gzip.decompress(base64.b64decode(data["V1 LIDAR Range Array"])).decode('utf-8'), sep='\n')
         # Cameras
-        front_camera_image = np.asarray(Image.open(BytesIO(base64.b64decode(data["V1 Front Camera Image"]))))
-        publish_camera_images(front_camera_image)
+        autodrive.front_camera_image = np.asarray(Image.open(BytesIO(base64.b64decode(data["V1 Front Camera Image"]))))
         # Lap data
-        lap_count = int(float(data["V1 Lap Count"]))
-        lap_time = float(data["V1 Lap Time"])
-        last_lap_time = float(data["V1 Last Lap Time"])
-        best_lap_time = float(data["V1 Best Lap Time"])
-        collision_count = int(float(data["V1 Collisions"]))
-        publish_lap_count_data(lap_count)
-        publish_lap_time_data(lap_time)
-        publish_last_lap_time_data(last_lap_time)
-        publish_best_lap_time_data(best_lap_time)
-        publish_collision_count_data(collision_count)
+        autodrive.lap_count = int(float(data["V1 Lap Count"]))
+        autodrive.lap_time = float(data["V1 Lap Time"])
+        autodrive.last_lap_time = float(data["V1 Last Lap Time"])
+        autodrive.best_lap_time = float(data["V1 Best Lap Time"])
+        autodrive.collision_count = int(float(data["V1 Collisions"]))
 
         ########################################################################
-        # CONTROL COMMANDS
+        # OUTGOING DATA
         ########################################################################
-        # Vehicle and traffic light control commands
-        sio.emit('Bridge', data={'V1 Throttle': str(throttle_command),
-                                 'V1 Steering': str(steering_command),
-                                 'Reset': str(reset_command)
+        # Vehicle and simulation commands
+        sio.emit('Bridge', data={'V1 Throttle': str(autodrive.throttle_command),
+                                 'V1 Steering': str(autodrive.steering_command),
+                                 'Reset': str(autodrive.reset_command)
                                  }
                 )
 
@@ -307,10 +305,44 @@ def bridge(sid, data):
 # AUTODRIVE ROS 2 BRIDGE INFRASTRUCTURE
 #########################################################
 
+def timer_callback():
+    global autodrive
+    # Actuator feedbacks
+    publish_actuator_feedbacks(autodrive.throttle, autodrive.steering)
+    # Speed
+    publish_speed_data(autodrive.speed)
+    # Wheel encoders
+    publish_encoder_data(autodrive.encoder_angles)
+    # IPS
+    publish_ips_data(autodrive.position)
+    # IMU
+    publish_imu_data(autodrive.orientation_quaternion, autodrive.angular_velocity, autodrive.linear_acceleration)
+    # Cooordinate transforms
+    broadcast_transform(msg_transform, transform_broadcaster, "f1tenth_1", "world", autodrive.position, autodrive.orientation_quaternion) # Vehicle frame defined at center of rear axle
+    broadcast_transform(msg_transform, transform_broadcaster, "left_encoder", "f1tenth_1", np.asarray([0.0, 0.12, 0.0]), quaternion_from_euler(0.0, 120*autodrive.encoder_angles[0]%6.283, 0.0))
+    broadcast_transform(msg_transform, transform_broadcaster, "right_encoder", "f1tenth_1", np.asarray([0.0, -0.12, 0.0]), quaternion_from_euler(0.0, 120*autodrive.encoder_angles[1]%6.283, 0.0))
+    broadcast_transform(msg_transform, transform_broadcaster, "ips", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+    broadcast_transform(msg_transform, transform_broadcaster, "imu", "f1tenth_1", np.asarray([0.08, 0.0, 0.055]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+    broadcast_transform(msg_transform, transform_broadcaster, "lidar", "f1tenth_1", np.asarray([0.2733, 0.0, 0.096]), np.asarray([0.0, 0.0, 0.0, 1.0]))
+    broadcast_transform(msg_transform, transform_broadcaster, "front_camera", "f1tenth_1", np.asarray([-0.015, 0.0, 0.15]), np.asarray([0, 0.0871557, 0, 0.9961947]))
+    broadcast_transform(msg_transform, transform_broadcaster, "front_left_wheel", "f1tenth_1", np.asarray([0.33, 0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(autodrive.steering))/(2*0.141537-2*0.0765*np.tan(autodrive.steering)))))
+    broadcast_transform(msg_transform, transform_broadcaster, "front_right_wheel", "f1tenth_1", np.asarray([0.33, -0.118, 0.0]), quaternion_from_euler(0.0, 0.0, np.arctan((2*0.141537*np.tan(autodrive.steering))/(2*0.141537+2*0.0765*np.tan(autodrive.steering)))))
+    broadcast_transform(msg_transform, transform_broadcaster, "rear_left_wheel", "f1tenth_1", np.asarray([0.0, 0.118, 0.0]), quaternion_from_euler(0.0, autodrive.encoder_angles[0]%6.283, 0.0))
+    broadcast_transform(msg_transform, transform_broadcaster, "rear_right_wheel", "f1tenth_1", np.asarray([0.0, -0.118, 0.0]), quaternion_from_euler(0.0, autodrive.encoder_angles[1]%6.283, 0.0))
+    # LIDAR
+    publish_lidar_scan(autodrive.lidar_scan_rate, autodrive.lidar_range_array, autodrive.lidar_intensity_array)
+    # Cameras
+    publish_camera_images(autodrive.front_camera_image)
+    # Lap data
+    publish_lap_count_data(autodrive.lap_count)
+    publish_lap_time_data(autodrive.lap_time)
+    publish_last_lap_time_data(autodrive.last_lap_time)
+    publish_best_lap_time_data(autodrive.best_lap_time)
+    publish_collision_count_data(autodrive.collision_count)
+
 def main():
     # Global declarations
-    global autodrive_bridge, cv_bridge, publishers, transform_broadcaster
-    global throttle_command, steering_command, reset_command
+    global autodrive, autodrive_bridge, cv_bridge, publishers, transform_broadcaster
 
     # ROS 2 infrastructure
     rclpy.init() # Initialize ROS 2 communication for this context
@@ -326,14 +358,14 @@ def main():
     publishers = {e.name: autodrive_bridge.create_publisher(e.type, e.topic, qos_profile)
                   for e in config.pub_sub_dict.publishers} # Publishers
     callbacks = {
-        # Vehicle data subscriber callbacks
         '/autodrive/f1tenth_1/throttle_command': callback_throttle_command,
         '/autodrive/f1tenth_1/steering_command': callback_steering_command,
         '/autodrive/reset_command': callback_reset_command
     } # Subscriber callback functions
-    subscribers = [autodrive_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile)
-                   for e in config.pub_sub_dict.subscribers] # Subscribers
-    subscribers # Avoid unused variable warning
+    [autodrive_bridge.create_subscription(e.type, e.topic, callbacks[e.topic], qos_profile) for e in config.pub_sub_dict.subscribers] # Subscribers
+
+    timer_period = 0.025 # Timer period in seconds
+    autodrive_bridge.create_timer(timer_period, timer_callback)
 
     # If num_threads is not specified then num_threads will be multiprocessing.cpu_count() if it is implemented
     # Otherwise it will use a single thread
