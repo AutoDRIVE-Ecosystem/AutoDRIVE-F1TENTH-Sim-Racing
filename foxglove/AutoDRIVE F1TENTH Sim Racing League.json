@@ -416,7 +416,8 @@
           "label": "Cooldown Lap"
         }
       ],
-      "foxglovePanelTitle": "Race Status"
+      "foxglovePanelTitle": "Race Status",
+      "fontSize": 36
     },
     "Indicator!2e4orhp": {
       "path": "/autodrive/f1tenth_1/collision_count.data",
@@ -431,7 +432,8 @@
           "label": "Qualified"
         }
       ],
-      "foxglovePanelTitle": "Race Qualification"
+      "foxglovePanelTitle": "Race Qualification",
+      "fontSize": 36
     },
     "Plot!26x9len": {
       "paths": [
@@ -600,7 +602,7 @@
           "direction": "column"
         },
         "direction": "row",
-        "splitPercentage": 60.86956521739128
+        "splitPercentage": 59.41358024691357
       },
       "second": {
         "first": {
@@ -616,10 +618,10 @@
           "splitPercentage": 44.39834024896266
         },
         "direction": "row",
-        "splitPercentage": 44.3996776792909
+        "splitPercentage": 43.59400998336106
       },
       "direction": "row",
-      "splitPercentage": 34.16445623342175
+      "splitPercentage": 35.027027027027025
     },
     "direction": "column",
     "splitPercentage": 74.16934619506966
