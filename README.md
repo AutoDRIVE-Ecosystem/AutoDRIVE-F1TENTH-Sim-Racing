@@ -8,6 +8,11 @@
 [![API Docker Stars](https://badgen.net/docker/stars/autodriveecosystem/autodrive_f1tenth_api?icon=docker&label=api%20stars)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_api/)
 [![API Docker Pulls](https://badgen.net/docker/pulls/autodriveecosystem/autodrive_f1tenth_api?icon=docker&label=api%20pulls)](https://hub.docker.com/r/autodriveecosystem/autodrive_f1tenth_api/)
 
+> [!WARNING]
+> - This repository has been **deprecated** and is no longer under active development.
+> - Active development has moved to [`AutoDRIVE-Ecosystem/AutoDRIVE-RoboRacer-Sim-Racing`](https://github.com/AutoDRIVE-Ecosystem/AutoDRIVE-RoboRacer-Sim-Racing).
+> - If you’re looking to use the latest version of the competition framework or contribute to it, please head over to the [new repository](https://github.com/AutoDRIVE-Ecosystem/AutoDRIVE-RoboRacer-Sim-Racing).
+
 ![AutoDRIVE-F1TENTH Sim-Racing](Banner.png)
 
 F1TENTH Digital Twin Autonomous Sim-Racing League using AutoDRIVE Ecosystem
